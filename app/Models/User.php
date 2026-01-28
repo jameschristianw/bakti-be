@@ -18,7 +18,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class User extends Authenticatable implements HasTenants
+class User extends Authenticatable implements HasTenants, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasUuids, HasRoles, LogsActivity;
@@ -65,6 +65,11 @@ class User extends Authenticatable implements HasTenants
         ];
     }
 
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+    }
+
     public function fellowships()
     {
         return $this->belongsToMany(Fellowship::class, 'fellowship_user', 'user_uuid', 'fellowship_uuid');
@@ -85,6 +90,6 @@ class User extends Authenticatable implements HasTenants
             return true;
         }
 
-        return $this->fellowships->contains($tenant);
+        return $this->fellowships()->whereKey($tenant->getKey())->exists();
     }
 }
