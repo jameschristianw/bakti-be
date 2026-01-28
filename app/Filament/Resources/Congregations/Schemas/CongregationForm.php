@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Congregations\Schemas;
 use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextArea;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
 
@@ -20,7 +20,7 @@ class CongregationForm
                 TextInput::make('nickname')->required()->maxLength(255),
                 TextInput::make('email')->email()->maxLength(255),
                 TextInput::make('phone_number')->required()->maxLength(255),
-                TextArea::make('address')->required()->rows(3),
+                Textarea::make('address')->required()->rows(3),
                 DatePicker::make('birth_date')->required(),
                 Select::make('gender')
                     ->options([
