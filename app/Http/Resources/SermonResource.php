@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class SermonResource extends JsonResource
 {
@@ -23,10 +24,15 @@ class SermonResource extends JsonResource
             'youtube_link' => $this->youtube_link,
             'content' => $this->content,
             'pastor' => $this->when($this->pastor, function () {
+                $pictureUrl = $this->pastor->picture_url;
+
+                if ($pictureUrl && !str_starts_with($pictureUrl, 'http')) {
+                    $pictureUrl = Storage::disk('public')->url($pictureUrl); // -> /storage/...
+                }
                 return [
                     'uuid' => $this->pastor->uuid,
                     'name' => $this->pastor->name,
-                    'picture_url' => $this->pastor->picture_url,
+                    'picture_url' => $pictureUrl,
                     'bio' => $this->pastor->bio,
                 ];
             }),
