@@ -20,7 +20,7 @@ class CongregationForm
                 TextInput::make('nickname')->required()->maxLength(255),
                 TextInput::make('email')->email()->maxLength(255),
                 TextInput::make('phone_number')->required()->maxLength(255),
-                Textarea::make('address')->required()->rows(3),
+                TextArea::make('address')->required()->rows(3),
                 DatePicker::make('birth_date')->required(),
                 Select::make('gender')
                     ->options([

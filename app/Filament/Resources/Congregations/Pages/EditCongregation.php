@@ -20,4 +20,17 @@ class EditCongregation extends EditRecord
             RestoreAction::make(),
         ];
     }
+
+    public function getTitle(): string
+    {
+        return 'Jemaat';
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            url()->current() => 'Jemaat',
+            'Ubah'
+        ];
+    }
 }

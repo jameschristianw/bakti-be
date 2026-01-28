@@ -117,27 +117,6 @@ class CongregationResource extends Resource
         return static::canManage();
     }
 
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery();
-
-        $currentUser = Filament::auth()?->user() ?? auth()->user();
-
-        if (! $currentUser) {
-            return $query->whereRaw('1 = 0');
-        }
-
-        if (! $currentUser->hasRole('Super Admin') && ! $currentUser->hasRole('Admin')) {
-            return $query->whereRaw('1 = 0');
-        }
-
-        if (! $currentUser->hasRole('Super Admin')) {
-            $query->where('email', '!=', 'admin@gpdibakti.id');
-        }
-
-        return $query;
-    }
-
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()
