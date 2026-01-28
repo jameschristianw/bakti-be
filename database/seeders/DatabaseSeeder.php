@@ -15,11 +15,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Run permission seeder first
+        $this->call(PermissionSeeder::class);
+        
+        // Create or get Super Admin role
+        $superAdminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Super Admin']);
+        
+        // Create or get admin user
+        $admin = \App\Models\User::firstOrCreate(
+            ['email' => 'admin@gpdibakti.id'],
+            [
+                'name' => 'Administrator',
+                'password' => bcrypt('master123'),
+            ]
+        );
+        
+        // Assign Super Admin role to admin user if not already assigned
+        if (!$admin->hasRole('Super Admin')) {
+            $admin->assignRole($superAdminRole);
+        }
+        
+        $this->command->info('Admin user ready!');
+        $this->command->info('Email: admin@gpdibakti.id');
+        $this->command->info('Password: master123');
+        $this->command->warn('Please change the default password after first login!');
     }
 }
