@@ -14,6 +14,8 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+
 use Filament\Facades\Filament;
 
 class RoleResource extends Resource
@@ -105,5 +107,18 @@ class RoleResource extends Resource
     public static function canRestoreAny(): bool
     {
         return static::canManage();
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $currentUser = Filament::auth()?->user() ?? auth()->user();
+
+        if (! $currentUser->hasRole('Super Admin')) {
+            $query->where('name', '!=', 'Super Admin');
+        }
+
+        return $query;
     }
 }
