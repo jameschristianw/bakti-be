@@ -40,5 +40,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Email: admin@gpdibakti.id');
         $this->command->info('Password: master123');
         $this->command->warn('Please change the default password after first login!');
+
+        // Call AdminRoleSeeder after creating the admin user
+        $this->call(AdminRoleSeeder::class);
     }
 }
