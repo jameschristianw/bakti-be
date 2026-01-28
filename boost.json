@@ -1,0 +1,17 @@
+{
+    "agents": [
+        "copilot"
+    ],
+    "guidelines": true,
+    "herd_mcp": false,
+    "mcp": true,
+    "packages": [
+        "filament/filament",
+        "laravel/fortify"
+    ],
+    "sail": false,
+    "skills": [
+        "tailwindcss-development",
+        "developing-with-fortify"
+    ]
+}

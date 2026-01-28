@@ -2,15 +2,32 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
-class User extends Authenticatable
+use Spatie\Permission\Traits\HasRoles;
+
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+
+class User extends Authenticatable implements HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasUuids, HasRoles, LogsActivity;
+
+    protected $primaryKey = 'uuid';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    public $timestamps = false; // only created_at exists per schema
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +38,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'created_at',
     ];
 
     /**
@@ -30,7 +48,8 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -41,8 +60,31 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    public function fellowships()
+    {
+        return $this->belongsToMany(Fellowship::class, 'fellowship_user', 'user_uuid', 'fellowship_uuid');
+    }
+
+    public function getTenants(Panel $panel): array|Collection
+    {
+        if ($this->hasRole('Super Admin')) {
+            return Fellowship::all();
+        }
+
+        return $this->fellowships;
+    }
+
+    public function canAccessTenant(Model $tenant): bool
+    {
+        if ($this->hasRole('Super Admin')) {
+            return true;
+        }
+
+        return $this->fellowships->contains($tenant);
     }
 }
